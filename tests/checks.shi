@@ -1,0 +1,16 @@
+function Compare()
+{
+  if test "x$1" != "x$2"; then
+    Msg=$'\n'"Expected: [$1]"$'\n'"Actual: [$2]"
+    Fail "$3:$Msg"
+  fi
+}
+
+function CheckLine()
+{
+  local Line
+  if read Line; then :; else
+    Fail "EOF before $1 line of the output"
+  fi
+  Compare "$Expected" "$Line" "Mismatch in $1 line"
+}

@@ -1,0 +1,21 @@
+function mtmodt()
+{
+  bash $LocationHere/bin/mtmodt "$@"
+}
+
+function FindExecutable()
+{
+  MAINFILE=$LocationHere/bin/mtmodt
+  MainFileFound=true
+}
+
+function Fail()
+{
+  echo "$1" >&2
+  exit 1
+}
+
+function Import()
+{
+  . $LocationHere/tests/$1.shi
+}

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+VERSION="0.0.0"
+YEARS="2018"
+
+set -eu
+
+function Help()
+{
+  echo $'Usage:\tmtmodt option'
+  echo "Options:"
+  echo $'--help\t\tShow this help'
+  echo $'--version\tShow version snf license information'
+}
+
+function Version()
+{
+  echo "mtmodt - MineTest MOD Test - Version: $VERSION"
+  echo "Copyright (C) $YEARS Jozef Behran"
+  echo "This program is free software, and you are welcome to redistribute"
+  echo "it under certain conditions. This program comes with ABSOLUTELY NO"
+  echo "WARRANTY. See the file LICENSE in the source distribution for more"
+  echo "details."
+}
+
+Command="x"
+while test "${1-n/a}" != "n/a"; do
+  if test $1 = "--help"; then
+    Command=Help
+  elif test $1 = "--version"; then
+    Command=Version
+  fi
+  shift
+done
+
+if test "$Command" != "x"; then
+  $Command
+  exit
+fi

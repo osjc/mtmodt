@@ -1,0 +1,12 @@
+# This file lists the subdirectories that contain test cases. The format is
+# very simple. Empty lines and lines with the "#" character at the first
+# column are ignored and all other lines contain names of the subdirectories
+# to be scanned for test cases, one name per line. Each of these lines
+# contains the name of the test directory in its first word and a short
+# description of the test directory (to be shown to the user) in the
+# remaining words.
+#
+# The remaining files in the root directory are test library modules loaded
+# by the test cases.
+
+base	basic functionality of the main program
