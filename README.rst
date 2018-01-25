@@ -32,6 +32,14 @@ findings and a short summary. The developer can also run "mtmodt
 useful to run iteratively as the developer is changing some functionality
 in her mod.
 
+Installation
+------------
+
+Put the <path-to-this-directory>/bin into your PATH. Or put a symbolic link
+to <path-to-this-directory>/bin/mtmodt into one of the directories that are
+on your PATH. For the prerequisities and detailed installations see the
+"`Getting Started <doc/manual.rst#getting-started>`_" chapter in the manual.
+
 Hacking
 -------
 

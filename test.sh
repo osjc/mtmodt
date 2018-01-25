@@ -13,12 +13,27 @@ function ExecuteShellTest()
   echo "rm -rf testcase.tmp" >testcase.tmp
   echo "LocationHere=$LocationHere" >>testcase.tmp
   echo 'export PATH="'"$StateBase"'/bin"' >>testcase.tmp
+  echo "export LUA=$LUA" >>testcase.tmp
   echo ". $LocationHere/tests/frmwork.shi" >>testcase.tmp
   echo ". $1 >output.log 2>error.log" >>testcase.tmp
   if bash -eu testcase.tmp; then
     Result="PASS"
   else
     Result="FAIL"
+  fi
+}
+
+function ExecuteLuaTest()
+{
+  MainDir="$LocationHere/lua"
+  echo 'LibDir = "'"$LocationHere/tests/"'"' >testcase.lua
+  echo 'MainDir = "'"$MainDir/"'"' >>testcase.lua
+  echo 'dofile(LibDir.."'"frmwork.lua"'")' >>testcase.lua
+  echo 'dofile("'"$MainDir/init.lua"'")' >>testcase.lua
+  echo 'dofile "'"$1"'"' >>testcase.lua
+  Result="FAIL"
+  if $LUA testcase.lua >output.log 2>error.log; then
+    Result="PASS"
   fi
 }
 
@@ -140,6 +155,22 @@ function CreateTestExecutionBase()
   ln -s $List bin
 }
 
+function FindWorkingLua()
+{
+  cd $StateBase
+  bash $LocationHere/bin/mtmodt --write-cfg >output.log 2>error.log || true
+  if test -f config.shi; then :; else
+    echo "---" >>output.log
+    echo "---" >>error.log
+    mtmodt --write-cfg >>output.log 2>>error.log || true
+    if test -f config.shi; then :; else
+      echo "Failed to locate working Lua"
+      exit 1
+    fi
+  fi
+  . ./config.shi
+}
+
 function RunListedTestCases()
 {
   StripSectionNameFromTestName=$1
@@ -161,6 +192,10 @@ function RunListedTestCases()
       ItemExtStr="SH "
       TestExec="ExecuteShellTest"
       MetaPrefix="#"
+    elif test "$ItemExt" = "lua"; then
+      ItemExtStr="LUA"
+      TestExec="ExecuteLuaTest"
+      MetaPrefix="--"
     else
       continue
     fi
@@ -285,6 +320,8 @@ function DetermineWhatToExecuteAndDoIt()
         Item="$1"
       elif test -f $1.sh; then
         Item="$1.sh"
+      elif test -f ${1-n/a}.lua; then
+        Item="$1.lua"
       else
         echo "ERROR: Test not found: $1"
         let CountTotal=CountTotal+1
@@ -361,5 +398,6 @@ function ShowStatistics()
 InitializeStats
 FindProgramLocation
 CreateTestExecutionBase
+FindWorkingLua
 DetermineWhatToExecuteAndDoIt "$@"
 ShowStatistics

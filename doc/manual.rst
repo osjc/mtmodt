@@ -147,16 +147,123 @@ idea came to have a program that would analyze and execute the test cases and
 the test cases themselves would contain only the test specific code.
 And so MineTest MOD Tester was born.
 
+Getting Started
+===============
+
+The program is designed to not require complicated installation and does not
+involve any "dotfiles" in the user home directory with options that need
+tweaking.
+
+Prerequisites
+-------------
+
+This program requires Lua 5.1 (any minor version) because that version of Lua
+is used by Minetest to run its mods and subgames. Different versions of Lua
+have different facilities and/or some of their common facilities differ in
+one way or another so testing results would be inconclusive if that different
+version of Lua was used to run the tests.
+
+This program also requires POSIX working environment with bash as the shell.
+The program is developed and tested on Linux. Other POSIX environments may
+or may not work; your mileage may vary.
+
+Installation
+------------
+
+The easiest way to install this is to put the "bin" subdirectory in the root
+of this project into your PATH so the shell can find the mtmodt executable.
+Another way is to create a soft-link to the "bin/mtmodt" executable somewhere
+in your PATH. Do not create a hardlink as it won't allow the program to find
+its Lua resources.
+
+This assumes that you have Lua 5.1 installed somewhere on your PATH. If that
+is not the case, create an environment variable called LUA that points to the
+standalone Lua 5.1 interpreter binary.
+
 Invoking mtmodt
 ===============
 
-The program supports the following command line options:
+The program mtmodt supports the following command line options:
 
 --help
   Show a quick summary of the usage and available options.
 
 --version
   Show version and licensing information.
+
+--write-cfg
+  Write autodetected configuration information into file "config.shi" in the
+  current directory. This is an internally used feature but it can help
+  troubleshoot problems if the program fails to work. See the chapter on
+  `autodetected configuration troubleshooting
+  <manual.rst#autodetected-configuration>`_ for more details.
+
+Troubleshooting
+===============
+
+Every effort was put into this program to make it work as flawlessly and as
+unobtrusively as possible but things don't always go as planned.
+
+Autodetected Configuration
+--------------------------
+
+The command line option "--write-cfg" runs the configuration autodetection
+part of mtmodt and then produces file "config.shi" with the configuration
+information as it would be used by mtmodt if run without this option. When
+mtmodt tends to fail in mysterious ways and the culprit appears to be
+somewhere in the Lua installation, this information may provide vital hints
+about what went wrong. The information is produced only if the configuration
+autodetection found all the mtmodt dependencies; if that search was not
+successful, you get an error message just like you run mtmodt without this
+option.
+
+As this option is not intended to be used generally, it does not provide the
+"bells and whistles" of typical user facing feature. The file is always
+called "config.shi", it is always produced in the current directory and it
+is overwritten without asking any questions first. The primary use of this
+option is by the mtmodt testsuite and troubleshooting is only a distant
+secondary.
+
+The information is stored as a shell script setting some variables.
+These variables are actually the variables used by the program itself
+whenever the item in question is needed:
+
+LUA
+  The Lua interpreter to be used to run the Lua portion of the code.
+
+MTMODTLUADIR
+  Location of the Lua portion of the code to use by the program.
+
+The LUA variable is the `officially documented environment variable
+<manual.rst#installation>`_ that you can set yourself to point the program to
+the correct version of Lua. If it is not set, the program tries to search for
+it and if found, it sets this value to whatever was found (most commonly this
+just will be "lua" to denote the program to be searched in PATH. The value
+emitted in the produced "config.shi" is the final value after the
+autoconfiguration step is completed, with any eventual adjustments. This
+value is what is  directly used by the mtmodt code to run Lua.
+
+If the program fails and the problem appears to be the Lua interpreter
+itself, the LUA variable gives the location of the Lua interpreter that the
+program is trying to use to run its Lua code. It is good idea to check
+whether this interpreter is really a Lua 5.1 interpreter and if it is
+working as intended. If in doubt, try compiling the Lua interpreter yourself
+(get the version 5.1.x from `the official Lua website <http://www.lua.org>`_
+as that is the Lua version embedded in Minetest) and then point the LUA
+environment variable to the resulting binary.
+
+The MTMODTLUADIR environment variable contains the directory where the Lua
+portion of mtmodt that is being used is located. Usually you don't need to
+care about this value too much and if the program is installed by one of the
+`documented ways <manual.rst#installation>`_, this value shall point to the
+"lua" directory that is next to the "bin" directory where the main executable
+resides. If that is not the case, the results are unpredictable because these
+two portions of the program work closely together and using the main
+executable from one version of mtmodt and the Lua code from another is most
+likely going to not to work. The best you can try to do here is to hunt down
+any MTMODTLUADIR environment variable in your .bashrc/,profile/.bash_init (or
+equivalent startup files if you use a different shell than bash) and see if
+the problem persists.
 
 Contributing to the project
 ===========================

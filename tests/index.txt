@@ -9,4 +9,5 @@
 # The remaining files in the root directory are test library modules loaded
 # by the test cases.
 
-base	basic functionality of the main program
+testbase	complex parts of the testsuite execution infrastructure
+base		basic functionality of the main program

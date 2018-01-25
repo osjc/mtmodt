@@ -14,3 +14,26 @@ function CheckLine()
   fi
   Compare "$Expected" "$Line" "Mismatch in $1 line"
 }
+
+function CheckProgramResourceSearch()
+{
+  if "$1" --write-cfg >mtmodt.out 2>mtmodt.err; then :; else
+    Fail "Program was supposed to execute successfully"
+  fi
+  if test -f config.shi; then :; else
+    Fail "The program failed to produce a configuration"
+  fi
+  . ./config.shi
+  Error="Program failed to find the correct resources"
+  Compare "$2" "$MTMODTLUADIR" "$Error"
+}
+
+function CheckProgramFailure()
+{
+  if $1 >mtmodt.out 2>mtmodt.err; then
+    Fail "Program was supposed to fail because $2 here"
+  fi
+  Content=`cat mtmodt.err`
+  Error="Program failed with the wrong error"
+  Compare "$3" "$Content" "$Error"
+}

@@ -11,6 +11,7 @@ function Help()
   echo "Options:"
   echo $'--help\t\tShow this help'
   echo $'--version\tShow version snf license information'
+  echo $'--write-cfg\tWrite configuration to ./config.shi'
 }
 
 function Version()
@@ -24,11 +25,14 @@ function Version()
 }
 
 Command="x"
+WriteConfiguration=false
 while test "${1-n/a}" != "n/a"; do
   if test $1 = "--help"; then
     Command=Help
   elif test $1 = "--version"; then
     Command=Version
+  elif test $1 = "--write-cfg"; then
+    WriteConfiguration=true
   fi
   shift
 done
@@ -37,3 +41,31 @@ if test "$Command" != "x"; then
   $Command
   exit
 fi
+
+LUA=${LUA-lua}
+if $LUA -v >/dev/null 2>&1; then :; else
+  echo "Lua not found" >&2
+  exit 1
+fi
+
+if test -d ${MTMODTLUADIR-/dev/null}; then :; else
+  MTMODTLUADIR=`dirname $0 2>/dev/null`/../lua
+  if test -f $MTMODTLUADIR/main.lua; then :; else
+    MTMODTLUADIR=`readlink $0 2>/dev/null` || true
+    MTMODTLUADIR=`dirname $MTMODTLUADIR 2>/dev/null`/../lua || true
+  fi
+  MTMODTLUADIR=`cd $MTMODTLUADIR >/dev/null 2>&1;pwd` || true
+  if test -f $MTMODTLUADIR/main.lua; then :; else
+    echo "Lua portion of the program not found" >&2
+    exit 1
+  fi
+fi
+
+if $WriteConfiguration; then
+  echo "LUA=$LUA" >config.shi
+  echo "MTMODTLUADIR=$MTMODTLUADIR" >>config.shi
+  exit
+fi
+
+export LUA_INIT="@$MTMODTLUADIR/init.lua"
+$LUA $MTMODTLUADIR/main.lua
